@@ -1,0 +1,9 @@
+version: "29"
+
+services:
+
+  db:
+    image: postgres:16
+
+  ports:
+    - "5432"
