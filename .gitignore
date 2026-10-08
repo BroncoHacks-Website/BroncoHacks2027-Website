@@ -1,9 +1,26 @@
 .idea/
 backend/target/
+backend/.idea/
+backend/.settings/
+backend/.classpath
+backend/.project
 node_modules/
 .next/
 frontend/node_modules/
 frontend/.next/
 *.iml
 target/
+out/
 .env
+.env.local
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
