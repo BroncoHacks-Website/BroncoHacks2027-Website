@@ -1,7 +1,46 @@
 :root {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #111827;
-  background: #f9fafb;
+  /* colors */
+  --dark-blue: #01203F; /* all paragraph text with light blue background */
+  --deep-blue: #1F4993; /* header, navbar background, important text, and paragraph text with eggshell background */
+  --eggshell: #F6F8ED; /* default background and unselected text in navbar */
+  --sky-blue: #5CBBD4; /* countdown background */
+  --light-blue: #CCE7E6; /* secondary background */
+  --lemon-lime: #D9E74C;
+  --blue-gradient: linear-gradient(180deg, #214FA4 0%, #24104C 100%); /* for register button and hall of fame box headers*/
+  --bronco-gradient: linear-gradient(180deg, var(--lemon-lime) 0%, var(--sky-blue) 100%); /* register button text, selected navbar item */
+
+  /*font families*/
+  --primary-font: "Nobel", Helvetica, Arial, sans-serif; /* headers and button text */
+  --secondary-font: "Space Grotesk", Helvetica, Arial, sans-serif; /* paragraph text */
+  --number-font: "Tektur", Helvetica, Arial, sans-serif; /* countdown numbers */
+
+  /*font sizing, weights, and line spacing */
+  --font-size-smallest: 18px;
+  --font-size-small: 22px;
+  --font-size-medium: 32px;
+  --font-size-large: 64px;
+  --font-weight-normal: 500;  
+  --font-weight-bold: 900; 
+  --font-style-normal: normal;
+  --line-height-normal: normal;
+
+  /* padding and margins*/
+  --padding-small: 8px; /* padding of items in homepage navbar */
+  --padding-medium: 20px; /* padding of items in team navbar */
+  --padding-large: 32px; /* padding between headers and text, and of team information on team page */
+  --margin-default: 0 0 0.25rem; /* between titles and subtitles */
+  --margin-large: 0 0 2rem; /* between text boxes */
+
+  /* accents */
+  --border: 4px solid var(--deep-blue);
+  --box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.25);
+  --text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.50);
+
+  /* buttons */
+  --button-border-radius: 999px;
+  --button-box-shadow: 2px 2px 2px 0 var(--dark-blue);
+  --button-padding: 16px 32px;
+
 }
 
 * {
@@ -11,6 +50,7 @@
 body {
   margin: 0;
   padding: 0;
+  
 }
 
 a {
@@ -62,7 +102,13 @@ a:hover {
   width: 100%;
   max-width: 380px;
   padding: 2.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: var(--eggshell);
+  border: var(--border);
+  box-shadow: var(--box-shadow);
+  font-family: var(--secondary-font);
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-normal);
+  color: var(--deep-blue);
 }
 
 .grid-list {
@@ -85,19 +131,24 @@ a:hover {
 }
 
 .auth-input {
+  font-family: var(--secondary-font);
+  font-size: var(--font-size-smallest);
+  font-weight: var(--font-weight-normal);
+  color: var(--deep-blue);
   height: 40px;
   padding: 0 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-size: 0.875rem;
+  /*font-size: 0.875rem;*/
   color: #111827;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .auth-input:focus {
-  border-color: #9ca3af;
-  box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.2);
+  border-color: var(--sky-blue);
+  box-shadow: 0 0 0 3px var(--sky-blue);
+  /*box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.2);*/
 }
 
 .button {
@@ -116,16 +167,34 @@ a:hover {
 }
 
 .auth-button {
-  height: 40px;
-  margin-top: 0;
-  border: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: background-color 0.15s;
+  /* layout */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* colors */
+  background: var(--blue-gradient); 
+  color: white;
+  /*sizing */
+  border-radius: var(--button-border-radius);
+  padding: var(--button-padding);
+  /* text */
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.auth-button__text {
+  /* adding --bronco-gradient to button text */
+  background: var(--bronco-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .auth-button:hover {
-  background-color: #374151;
+  transition: ease 0.3s;
+  opacity: 0.9;
 }
 
 .button:disabled {
@@ -134,18 +203,21 @@ a:hover {
 }
 
 .title {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-family: var(--primary-font);
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-bold);
   text-align: center;
-  color: #111827;
-  margin: 0 0 0.25rem;
+  color: var(--deep-blue);
+  margin: var(--margin-default);
 }
 
 .subtitle {
-  font-size: 0.875rem;
+  font-family: var(--secondary-font);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-normal);
   text-align: center;
-  color: #6b7280;
-  margin: 0 0 2rem;
+  color: var(--deep-blue);
+  margin: var(--margin-large);
 }
 
 .form {
@@ -160,12 +232,11 @@ a:hover {
 }
 
 .label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.375rem;
+  font-family: var(--secondary-font);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-normal);
+  color: var(--deep-blue);
+  margin: var(--margin-default);
 }
 
 .status-open {
@@ -203,5 +274,5 @@ a:hover {
 
 .form-error {
   color: red;
-  font-size: 0.85rem;
+  font-size: var(--font-size-smallest);
 }
