@@ -1,0 +1,400 @@
+{
+  "info": {
+    "_postman_id": "00b08839-08f0-4f1b-a7a2-5fb755916eab",
+    "name": "BroncoHacks Local",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58745852"
+  },
+  "item": [
+    {
+      "name": "GET /api/teams",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/teams",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "teams"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "GET /api/teams",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "transfer-encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 08 Oct 2026 01:30:58 GMT"
+            },
+            {
+              "key": "keep-alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"successful\": true,\n  \"message\": \"Teams listed successfully\",\n  \"data\": [\n    {\n      \"captain\": null,\n      \"members\": [],\n      \"teamName\": \"TestTeam\",\n      \"teamID\": 0,\n      \"inviteCode\": \"AC913CD3-1\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /api/teams",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"teamName\": \"TestTeam\",\r\n  \"userName\": \"testUser\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/teams/leave",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "teams",
+            "leave"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "POST /api/teams",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"teamName\": \"PostmanTeam\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "transfer-encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 08 Oct 2026 01:42:41 GMT"
+            },
+            {
+              "key": "keep-alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"successful\": true,\n  \"message\": \"New team created successfully\",\n  \"data\": [\n    {\n      \"captain\": null,\n      \"members\": [],\n      \"teamName\": \"PostmanTeam\",\n      \"teamID\": 1,\n      \"inviteCode\": \"296A93D1-C\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "/api/teams",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/teams",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "teams"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Error - Missing team name",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "transfer-encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 08 Oct 2026 04:02:14 GMT"
+            },
+            {
+              "key": "connection",
+              "value": "close"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"successful\": false,\n  \"message\": \"Team name cannot be blank\",\n  \"data\": null\n}"
+        }
+      ]
+    },
+    {
+      "name": "/api/teams/join",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"inviteCode\": \"AC913CD3-1\",\r\n  \"newMemberName\": \"testUser\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/teams/join",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "teams",
+            "join"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Success - User joined team",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"inviteCode\": \"AC913CD3-1\",\r\n  \"newMemberName\": \"testUser\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                "join"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "transfer-encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 08 Oct 2026 04:03:39 GMT"
+            },
+            {
+              "key": "keep-alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"successful\": true,\n  \"message\": \"User added to team successfully\",\n  \"data\": [\n    {\n      \"captain\": null,\n      \"members\": [\n        {\n          \"username\": \"testUser\",\n          \"email\": \"test@gmail.com\"\n        }\n      ],\n      \"teamName\": \"TestTeam\",\n      \"teamID\": 0,\n      \"inviteCode\": \"AC913CD3-1\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "/api/teams/leave",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"teamName\": \"TestTeam\",\r\n  \"userName\": \"testUser\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/teams/leave",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "teams",
+            "leave"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Success - User left team",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"teamName\": \"TestTeam\",\r\n  \"userName\": \"testUser\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/leave",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                "leave"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "transfer-encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 08 Oct 2026 04:05:22 GMT"
+            },
+            {
+              "key": "keep-alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"successful\": true,\n  \"message\": \"Left team successfully\",\n  \"data\": [\n    {\n      \"captain\": null,\n      \"members\": [],\n      \"teamName\": \"TestTeam\",\n      \"teamID\": 0,\n      \"inviteCode\": \"AC913CD3-1\"\n    }\n  ]\n}"
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    }
+  ]
+}
