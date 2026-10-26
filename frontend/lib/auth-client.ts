@@ -1,3 +1,5 @@
+import { apiFetch } from "./api-client";
+
 export type AuthUser = {
   id: string;
   name: string;
@@ -57,23 +59,15 @@ export async function signIn(
 
 export async function signUp(
   request: SignUpRequest
-): Promise<AuthResult> {
-  // Future backend integration:
-  // POST /api/auth/sign-up
-
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  return {
-    ok: true,
-    data: {
-      user: {
-        id: "999",
-        name: request.name,
-        email: request.email,
-      },
-      token: "fake-sign-up-token",
-    },
-  };
+): Promise<void> {
+  await apiFetch<null>("/auth/signup", {
+    method: "POST",
+    body: JSON.stringify({
+      username: request.name,
+      email: request.email,
+      password: request.password,
+    }),
+  });
 }
 
 export function isAuthenticated(): boolean {
