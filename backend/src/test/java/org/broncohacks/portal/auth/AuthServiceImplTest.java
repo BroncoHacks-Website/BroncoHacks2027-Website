@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
+import org.broncohacks.portal.JwtService;
 import org.broncohacks.portal.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 class AuthServiceImplTest {
   @Spy private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   @Mock private UserRepository userRepository;
+  @Mock private JwtService jwtService;
 
   @InjectMocks private AuthServiceImpl authService;
 
@@ -83,6 +85,23 @@ class AuthServiceImplTest {
     ResponseEntity<AuthResponse> res = new SignUpController(authService).signIn(req);
     assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
     assertEquals("Username already taken", res.getBody().getMessage());
+  }
+
+  @Test
+  void signInReturnsToken() {
+    String realHash = passwordEncoder.encode("CorrectPass1!");
+    when(userRepository.findByUsername("bob"))
+        .thenReturn(Optional.of(new User("bob", realHash, "bob@test.com")));
+    when(jwtService.createToken("bob")).thenReturn("signed-token");
+
+    SignInRequest request = new SignInRequest();
+    request.setUsername("bob");
+    request.setPassword("CorrectPass1!");
+
+    AuthResponse response = authService.signIn(request);
+
+    assertTrue(response.isSuccessful());
+    assertEquals("signed-token", response.getToken());
   }
 
   @Test

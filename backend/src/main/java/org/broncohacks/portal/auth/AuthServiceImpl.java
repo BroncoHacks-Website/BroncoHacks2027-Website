@@ -1,6 +1,7 @@
 package org.broncohacks.portal.auth;
 
 import java.util.Optional;
+import org.broncohacks.portal.JwtService;
 import org.broncohacks.portal.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,13 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
 
-  public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+  public AuthServiceImpl(
+      UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.jwtService = jwtService;
   }
 
   @Override
@@ -31,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     // save a new User, return a success/failure AuthResponse
     User newUser = new User(request.getUsername(), hashedPassword, request.getEmail());
     userRepository.create(newUser);
+    // TODO: return jwt if needed
     return new AuthResponse(true, "Account created successfully", null);
   }
 
@@ -43,7 +48,8 @@ public class AuthServiceImpl implements AuthService {
     }
     // Success!
     if (passwordEncoder.matches(request.getPassword(), user.get().getPwHash())) {
-      return new AuthResponse(true, "Signed in successfully", null);
+      String token = jwtService.createToken(user.get().getUsername());
+      return new AuthResponse(true, "Signed in successfully", token);
     }
     // If password doesn't match user's hashedPW, reject.
     return new AuthResponse(false, "Username or password incorrect", null);
