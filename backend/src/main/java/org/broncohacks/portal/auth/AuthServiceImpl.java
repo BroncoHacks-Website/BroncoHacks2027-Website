@@ -1,5 +1,6 @@
 package org.broncohacks.portal.auth;
 
+import java.util.Map;
 import java.util.Optional;
 import org.broncohacks.portal.JwtService;
 import org.broncohacks.portal.User;
@@ -49,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
     // Success!
     if (passwordEncoder.matches(request.getPassword(), user.get().getPwHash())) {
       String token = jwtService.createToken(user.get().getUsername());
-      return new AuthResponse(true, "Signed in successfully", token);
+      return new AuthResponse(true, "Signed in successfully", Map.of("token", token));
     }
     // If password doesn't match user's hashedPW, reject.
     return new AuthResponse(false, "Username or password incorrect", null);

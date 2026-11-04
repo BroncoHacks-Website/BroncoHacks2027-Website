@@ -3,6 +3,9 @@ package org.broncohacks.portal.auth;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import java.util.Optional;
 import org.broncohacks.portal.JwtService;
 import org.broncohacks.portal.User;
@@ -101,7 +104,13 @@ class AuthServiceImplTest {
     AuthResponse response = authService.signIn(request);
 
     assertTrue(response.isSuccessful());
-    assertEquals("signed-token", response.getToken());
+    assertEquals(Map.of("token", "signed-token"), response.getData());
+    JsonNode json = new ObjectMapper().valueToTree(response);
+    assertEquals(3, json.size());
+    assertTrue(json.get("successful").asBoolean());
+    assertEquals("Signed in successfully", json.get("message").asText());
+    assertEquals("signed-token", json.get("data").get("token").asText());
+    assertFalse(json.has("token"));
   }
 
   @Test

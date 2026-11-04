@@ -15,7 +15,7 @@ public class JwtService {
   private static final Duration TOKEN_LIFETIME = Duration.ofHours(24);
   private final SecretKey key;
 
-  public JwtService(@Value("${JWT_SECRET}") String secret) {
+  public JwtService(@Value("${jwt.secret}") String secret) {
     this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
   }
 

@@ -3,12 +3,12 @@ package org.broncohacks.portal.auth;
 public class AuthResponse {
   private boolean successful;
   private String message;
-  private String token;
+  private Object data;
 
-  public AuthResponse(boolean successful, String message, String token) {
+  public AuthResponse(boolean successful, String message, Object data) {
     this.successful = successful;
     this.message = message;
-    this.token = token;
+    this.data = data;
   }
 
   public boolean isSuccessful() {
@@ -19,7 +19,7 @@ public class AuthResponse {
     return message;
   }
 
-  public String getToken() {
-    return token;
+  public Object getData() {
+    return data;
   }
 }
