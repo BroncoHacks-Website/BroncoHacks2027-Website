@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&family=Sora:wght@500&family=Oxanium:wght@500&display=swap");
 :root {
   /* colors */
   --dark-blue: #01203F; /* all paragraph text with light blue background */
@@ -10,9 +11,9 @@
   --bronco-gradient: linear-gradient(180deg, var(--lemon-lime) 0%, var(--sky-blue) 100%); /* register button text, selected navbar item */
 
   /*font families*/
-  --primary-font: "Nobel", Helvetica, Arial, sans-serif; /* headers and button text */
-  --secondary-font: "Space Grotesk", Helvetica, Arial, sans-serif; /* paragraph text */
-  --number-font: "Tektur", Helvetica, Arial, sans-serif; /* countdown numbers */
+  --primary-font: "Montserrat", Helvetica, Arial, sans-serif; /* headers and button text */
+  --secondary-font: "Sora", Helvetica, Arial, sans-serif; /* paragraph text */
+  --number-font: "Oxanium", Helvetica, Arial, sans-serif; /* countdown numbers */
 
   /*font sizing, weights, and line spacing */
   --font-size-smallest: 18px;
