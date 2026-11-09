@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-broncohacks}
       POSTGRES_USER: ${DB_USER:-broncohacks}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-bronchohacks}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-broncohacks}
     ports:
       - "5432:5432"
     volumes:
