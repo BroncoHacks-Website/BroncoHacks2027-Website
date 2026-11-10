@@ -50,7 +50,7 @@ export default function SignInPage() {
 
   return (
     <AuthCard
-      title="Welcome back"
+      title="Welcome Back"
       subtitle="Sign in to your account to continue"
     >
       <form className="form" onSubmit={handleSubmit}>

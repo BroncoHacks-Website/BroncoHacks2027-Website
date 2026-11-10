@@ -3,20 +3,28 @@ package org.broncohacks.portal.auth;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import java.util.Optional;
+import org.broncohacks.portal.JwtService;
 import org.broncohacks.portal.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
-
+  @Spy private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   @Mock private UserRepository userRepository;
+  @Mock private JwtService jwtService;
 
   @InjectMocks private AuthServiceImpl authService;
 
@@ -80,6 +88,29 @@ class AuthServiceImplTest {
     ResponseEntity<AuthResponse> res = new SignUpController(authService).signIn(req);
     assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
     assertEquals("Username already taken", res.getBody().getMessage());
+  }
+
+  @Test
+  void signInReturnsToken() {
+    String realHash = passwordEncoder.encode("CorrectPass1!");
+    when(userRepository.findByUsername("bob"))
+        .thenReturn(Optional.of(new User("bob", realHash, "bob@test.com")));
+    when(jwtService.createToken("bob")).thenReturn("signed-token");
+
+    SignInRequest request = new SignInRequest();
+    request.setUsername("bob");
+    request.setPassword("CorrectPass1!");
+
+    AuthResponse response = authService.signIn(request);
+
+    assertTrue(response.isSuccessful());
+    assertEquals(Map.of("token", "signed-token"), response.getData());
+    JsonNode json = new ObjectMapper().valueToTree(response);
+    assertEquals(3, json.size());
+    assertTrue(json.get("successful").asBoolean());
+    assertEquals("Signed in successfully", json.get("message").asText());
+    assertEquals("signed-token", json.get("data").get("token").asText());
+    assertFalse(json.has("token"));
   }
 
   @Test

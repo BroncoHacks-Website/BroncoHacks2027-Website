@@ -11,7 +11,9 @@ export default function AuthSubmitButton({
 }: AuthSubmitButtonProps) {
   return (
     <button type="submit" className="button auth-button" disabled={isSubmitting}>
-      {isSubmitting ? loadingText : defaultText}
+      <span className="auth-button__text">
+        {isSubmitting ? loadingText : defaultText}
+      </span>
     </button>
   );
 }
