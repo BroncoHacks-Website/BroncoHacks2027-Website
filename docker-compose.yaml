@@ -1,9 +1,14 @@
-version: "29"
-
 services:
-
   db:
     image: postgres:16
+    environment:
+      POSTGRES_DB: ${DB_NAME:-broncohacks}
+      POSTGRES_USER: ${DB_USER:-broncohacks}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-broncohacks}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
-  ports:
-    - "5432"
+volumes:
+  pgdata:

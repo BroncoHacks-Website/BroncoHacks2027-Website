@@ -1,6 +1,13 @@
 spring:
   application:
     name: broncohacks-portal-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/broncohacks}
+    username: ${DB_USER:broncohacks}
+    password: ${DB_PASSWORD:broncohacks}
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 server:
   port: 8080
