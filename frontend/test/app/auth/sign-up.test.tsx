@@ -1,6 +1,10 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import {  describe, expect, it, beforeEach, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import SignUpPage from "../../../app/(auth)/sign-up/page";
+
+vi.mock("../../../lib/api-client", () => ({
+  apiFetch: vi.fn().mockResolvedValue(null),
+}));
 
 describe("SignUpPage submit states", () => {
   beforeEach(() => {
@@ -32,7 +36,7 @@ describe("SignUpPage submit states", () => {
     });
 
     fireEvent.change(screen.getByPlaceholderText("••••••••"), {
-      target: { value: "password123" },
+      target: { value: "Password123!" },
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Sign Up" }));
