@@ -31,6 +31,20 @@ function validateEmail(email: string) {
 function validatePassword(password: string) {
   if (!password) return "Password is required.";
   if (password.length < 8) return "Password must be at least 8 characters.";
+
+  return "";
+}
+
+function validateNewPassword(password: string) {
+  const passwordError = validatePassword(password);
+  if (passwordError) return passwordError;
+
+  if (!/.*[A-Z].*/.test(password)) return "Password must contain at least one uppercase letter.";
+
+  if(!/.*[0-9].*/.test(password)) return "Password must contain at least one number.";
+
+  if(!/.*[!@#$%^&*].*/.test(password)) return "Password must contain at least one special character.";
+
   return "";
 }
 
@@ -45,7 +59,7 @@ export function validateSignUp(values: SignUpFormValues): SignUpErrors {
   return {
     name: values.name ? "" : "Name is required.",
     email: validateEmail(values.email),
-    password: validatePassword(values.password),
+    password: validateNewPassword(values.password),
   };
 }
 
