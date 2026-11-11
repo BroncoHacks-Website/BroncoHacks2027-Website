@@ -29,83 +29,89 @@ class AuthServiceImplTest {
   @InjectMocks private AuthServiceImpl authService;
 
   @Test
-  void signUpFailsWhenUsernameAlreadyExists() {
-    when(userRepository.findByUsername("bob"))
+  void signUpFailsWhenEmailAlreadyExists() {
+    when(userRepository.findByEmail("bob@test.com"))
         .thenReturn(Optional.of(new User("bob", "somehash", "bob@test.com")));
 
-    SignUpRequest request = new SignUpRequest();
-    request.setUsername("bob");
-    request.setPassword("Abcdefg1!");
-    request.setEmail("bob@test.com");
+    SignUpRequest req = new SignUpRequest();
+    req.setName("Another Bob");
+    req.setPassword("Abcdefg1!");
+    req.setEmail(" BOB@Test.com ");
 
-    AuthResponse response = authService.signUp(request);
+    AuthResponse res = authService.signUp(req);
 
-    assertFalse(response.isSuccessful());
-    assertEquals("Username already taken", response.getMessage());
+    assertFalse(res.isSuccessful());
+    assertEquals("An account with this email already exists", res.getMessage());
     verify(userRepository, never()).create(any());
   }
 
   @Test
   void signUpFailsWhenPasswordViolatesPolicy() {
-    when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
+    when(userRepository.findByEmail("new@test.com")).thenReturn(Optional.empty());
 
-    SignUpRequest request = new SignUpRequest();
-    request.setUsername("newuser");
-    request.setPassword("weak");
-    request.setEmail("new@test.com");
+    SignUpRequest req = new SignUpRequest();
+    req.setName("newuser");
+    req.setPassword("weak");
+    req.setEmail(" NEW@Test.com ");
 
-    AuthResponse response = authService.signUp(request);
+    AuthResponse res = authService.signUp(req);
 
-    assertFalse(response.isSuccessful());
+    assertFalse(res.isSuccessful());
     verify(userRepository, never()).create(any());
   }
 
   @Test
   void signUpSucceedsAndSavesUser() {
-    when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
+    when(userRepository.findByEmail("new@test.com")).thenReturn(Optional.empty());
 
-    SignUpRequest request = new SignUpRequest();
-    request.setUsername("newuser");
-    request.setPassword("Abcdefg1!");
-    request.setEmail("new@test.com");
+    SignUpRequest req = new SignUpRequest();
+    req.setName("newuser");
+    req.setPassword("Abcdefg1!");
+    req.setEmail(" NEW@Test.com ");
 
-    AuthResponse response = authService.signUp(request);
+    AuthResponse res = authService.signUp(req);
 
-    assertTrue(response.isSuccessful());
-    verify(userRepository, times(1)).create(any(User.class));
+    assertTrue(res.isSuccessful());
+    verify(userRepository)
+        .create(
+            argThat(
+                user ->
+                    user.getName().equals("newuser")
+                        && user.getEmail().equals("new@test.com")
+                        && passwordEncoder.matches("Abcdefg1!", user.getPwHash())));
   }
 
   @Test
   void signUpReturnsBadRequestOnFail() {
-    when(userRepository.findByUsername("bob"))
+    when(userRepository.findByEmail("bob@test.com"))
         .thenReturn(Optional.of(new User("bob", "hash", "bob@test.com")));
 
     SignUpRequest req = new SignUpRequest();
-    req.setUsername("bob");
+    req.setName("bob");
     req.setPassword("Abcdefg1!");
     req.setEmail("bob@test.com");
 
     ResponseEntity<AuthResponse> res = new SignUpController(authService).signIn(req);
     assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
-    assertEquals("Username already taken", res.getBody().getMessage());
+    assertEquals("An account with this email already exists", res.getBody().getMessage());
   }
 
   @Test
   void signInReturnsToken() {
     String realHash = passwordEncoder.encode("CorrectPass1!");
-    when(userRepository.findByUsername("bob"))
+    when(userRepository.findByEmail("bob@test.com"))
         .thenReturn(Optional.of(new User("bob", realHash, "bob@test.com")));
-    when(jwtService.createToken("bob")).thenReturn("signed-token");
+    when(jwtService.createToken("bob@test.com")).thenReturn("signed-token");
 
-    SignInRequest request = new SignInRequest();
-    request.setUsername("bob");
-    request.setPassword("CorrectPass1!");
+    SignInRequest req = new SignInRequest();
+    req.setEmail(" BOB@Test.com ");
+    req.setPassword("CorrectPass1!");
 
-    AuthResponse response = authService.signIn(request);
+    AuthResponse res = authService.signIn(req);
+    assertTrue(res.isSuccessful());
+    assertEquals(Map.of("token", "signed-token"), res.getData());
 
-    assertTrue(response.isSuccessful());
-    assertEquals(Map.of("token", "signed-token"), response.getData());
-    JsonNode json = new ObjectMapper().valueToTree(response);
+    JsonNode json = new ObjectMapper().valueToTree(res);
     assertEquals(3, json.size());
     assertTrue(json.get("successful").asBoolean());
     assertEquals("Signed in successfully", json.get("message").asText());
@@ -118,16 +124,45 @@ class AuthServiceImplTest {
     String realHash =
         new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
             .encode("CorrectPass1!");
-    when(userRepository.findByUsername("bob"))
+    when(userRepository.findByEmail("bob@test.com"))
         .thenReturn(Optional.of(new User("bob", realHash, "bob@test.com")));
 
     SignInRequest request = new SignInRequest();
-    request.setUsername("bob");
+    request.setEmail("bob@test.com");
     request.setPassword("WrongPassword!");
 
-    AuthResponse response = authService.signIn(request);
+    AuthResponse res = authService.signIn(request);
 
-    assertFalse(response.isSuccessful());
-    assertEquals("Username or password incorrect", response.getMessage());
+    assertFalse(res.isSuccessful());
+    assertEquals("Email or password incorrect", res.getMessage());
+  }
+
+  @Test
+  void signInFailsWithUnknownEmail() {
+    when(userRepository.findByEmail("missing@test.com")).thenReturn(Optional.empty());
+    SignInRequest request = new SignInRequest();
+    request.setEmail("missing@test.com");
+    request.setPassword("CorrectPass1!");
+
+    AuthResponse res = authService.signIn(request);
+
+    assertFalse(res.isSuccessful());
+    assertEquals("Email or password incorrect", res.getMessage());
+    assertNull(res.getData());
+    verifyNoInteractions(jwtService);
+  }
+
+  @Test
+  void signInFailsWithNullPassword() {
+    when(userRepository.findByEmail("bob@test.com"))
+        .thenReturn(Optional.of(new User("Bob", "hash", "bob@test.com")));
+    SignInRequest req = new SignInRequest();
+    req.setEmail("bob@test.com");
+
+    AuthResponse res = authService.signIn(req);
+
+    assertFalse(res.isSuccessful());
+    assertEquals("Email or password incorrect", res.getMessage());
+    verifyNoInteractions(jwtService);
   }
 }

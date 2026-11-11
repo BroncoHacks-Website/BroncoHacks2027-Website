@@ -22,37 +22,32 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public AuthResponse signUp(SignUpRequest request) {
-    // check username isn't taken, hash request.getPassword(),
-    if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-      return new AuthResponse(false, "Username already taken", null);
-    }
-    String passwordValidation = PasswordPolicies.validate(request.getPassword());
-    if (passwordValidation != null) {
-      return new AuthResponse(false, passwordValidation, null);
+    if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+      return new AuthResponse(false, "An account with this email already exists", null);
     }
 
-    String hashedPassword = passwordEncoder.encode(request.getPassword());
+    Optional<String> validationError = PasswordPolicies.validate(request.getPassword());
+    if (validationError.isPresent()) {
+      return new AuthResponse(false, validationError.get(), null);
+    }
 
-    // save a new User, return a success/failure AuthResponse
-    User newUser = new User(request.getUsername(), hashedPassword, request.getEmail());
-    userRepository.create(newUser);
-    // TODO: return jwt if needed
+    User user =
+        new User(
+            request.getName(), passwordEncoder.encode(request.getPassword()), request.getEmail());
+    userRepository.create(user);
     return new AuthResponse(true, "Account created successfully", null);
   }
 
   @Override
   public AuthResponse signIn(SignInRequest request) {
-    Optional<User> user = userRepository.findByUsername(request.getUsername());
-    // If user is empty, reject.
-    if (user.isEmpty()) {
-      return new AuthResponse(false, "Username Empty", null);
+    Optional<User> user = userRepository.findByEmail(request.getEmail());
+    if (user.isEmpty()
+        || request.getPassword() == null
+        || !passwordEncoder.matches(request.getPassword(), user.get().getPwHash())) {
+      return new AuthResponse(false, "Email or password incorrect", null);
     }
-    // Success!
-    if (passwordEncoder.matches(request.getPassword(), user.get().getPwHash())) {
-      String token = jwtService.createToken(user.get().getUsername());
-      return new AuthResponse(true, "Signed in successfully", Map.of("token", token));
-    }
-    // If password doesn't match user's hashedPW, reject.
-    return new AuthResponse(false, "Username or password incorrect", null);
+
+    String token = jwtService.createToken(user.get().getEmail());
+    return new AuthResponse(true, "Signed in successfully", Map.of("token", token));
   }
 }
