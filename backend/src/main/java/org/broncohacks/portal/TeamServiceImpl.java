@@ -12,10 +12,12 @@ import java.util.Optional;
 public class TeamServiceImpl implements TeamService{
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final TeamProperties teamProperties;
 
-    public TeamServiceImpl(TeamRepository teamRepository, UserRepository userRepository) {
+    public TeamServiceImpl(TeamRepository teamRepository, UserRepository userRepository, TeamProperties teamProperties) {
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
+        this.teamProperties = teamProperties;
     }
 
     public TeamResponse listTeams() {
@@ -23,6 +25,9 @@ public class TeamServiceImpl implements TeamService{
         boolean successful = true;
         String message = "Teams listed successfully";
         List<Team> teamList = teamRepository.findAll();
+        for (Team team : teamList) {
+            team.setComplete(team.size() >= teamProperties.minSize());
+        }
         TeamResponse response = new TeamResponse(successful, message, teamList);
         return response;
     }
@@ -42,6 +47,7 @@ public class TeamServiceImpl implements TeamService{
         }
 
         Team newTeam = new Team(newTeamName);
+        newTeam.setComplete(newTeam.size() >= teamProperties.minSize());
         teamRepository.save(newTeam);
         List<Team> responseData = List.of(newTeam);
         TeamResponse response = new TeamResponse(true, "New team created successfully", responseData);
@@ -75,8 +81,12 @@ public class TeamServiceImpl implements TeamService{
         }
 
         //Successful!
-        if (teamToJoin.addMember(userToJoin.get())) {
-            TeamResponse response = new TeamResponse(true, "User added to team successfully", List.of(teamToJoin));
+        if (teamToJoin.addMember(userToJoin.get(), teamProperties.maxSize())) {
+
+            teamToJoin.setComplete(teamToJoin.size() >= teamProperties.minSize());
+
+            TeamResponse response = new TeamResponse(true, "User added to team successfully",
+                    List.of(teamToJoin));
             return response;
         }
         //Team is full
@@ -109,6 +119,7 @@ public class TeamServiceImpl implements TeamService{
         }
 
         teamToLeave.removeMember(userToLeave.get().getUsername());
+        teamToLeave.setComplete(teamToLeave.size() >= teamProperties.minSize());
         List<Team> responseData = List.of(teamToLeave);
         TeamResponse response = new TeamResponse(true, "Left team successfully", responseData);
         return response;
