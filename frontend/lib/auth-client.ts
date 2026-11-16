@@ -71,5 +71,5 @@ export async function signUp(
 }
 
 export function isAuthenticated(): boolean {
-  return false;
+  return typeof window !== "undefined" && Boolean(window.sessionStorage.getItem("authToken"));
 }
