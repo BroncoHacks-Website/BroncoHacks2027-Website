@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.broncohacks.portal.BroncoHacksPortalApplication;
+import org.broncohacks.portal.GlobalExceptionHandler;
 import org.broncohacks.portal.JwtService;
 import org.broncohacks.portal.User;
 import org.junit.jupiter.api.AfterEach;
@@ -27,7 +28,7 @@ class EmailAuthIntegrationTest {
 
   @BeforeEach
   void setup() {
-    originalUsers = new ArrayList<>(BroncoHacksPortalApplication.databaseUsers);
+    this.originalUsers = new ArrayList<>(BroncoHacksPortalApplication.databaseUsers);
     BroncoHacksPortalApplication.databaseUsers.clear();
     AuthService service =
         new AuthServiceImpl(
@@ -37,7 +38,7 @@ class EmailAuthIntegrationTest {
     mvc =
         MockMvcBuilders.standaloneSetup(
                 new SignUpController(service), new SignInController(service))
-            .setControllerAdvice(new AuthExceptionHandler())
+            .setControllerAdvice(new GlobalExceptionHandler())
             .build();
   }
 

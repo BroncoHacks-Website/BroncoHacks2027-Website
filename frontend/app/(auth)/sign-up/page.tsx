@@ -23,6 +23,7 @@ export default function SignUpPage() {
   });
 
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const [submitError, setSubmitError] = useState("");
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -36,17 +37,17 @@ export default function SignUpPage() {
     setErrors(newErrors);
 
     if (hasValidationErrors(newErrors)) {
+      setSubmitError("");
       setSubmitState("error");
       return;
     }
 
     try {
       setSubmitState("submitting");
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
+      await signUp({ name, email, password });
       setSubmitState("success");
-    } catch {
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Unable to create account.");
       setSubmitState("error");
     }
   };
@@ -104,7 +105,9 @@ export default function SignUpPage() {
         )}
 
         {submitState === "error" && (
-          <p className="status-full">Please fix the highlighted errors.</p>
+          <p className="status-full">
+            {submitError || "Please fix the highlighted errors."}
+          </p>
         )}
       </form>
     </AuthCard>

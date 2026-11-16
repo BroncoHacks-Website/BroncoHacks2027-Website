@@ -67,7 +67,7 @@ describe("auth validation", () => {
     const errors = validateSignUp({
       name: "Ahmad",
       email: "ahmad@example.com",
-      password: "password123",
+      password: "Password123!",
     });
 
     expect(errors.name).toBe("");
