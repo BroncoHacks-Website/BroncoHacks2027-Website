@@ -16,7 +16,7 @@ public class Team {
         idCounter++;
     }
 
-    static private int MAX_TEAM_SIZE = 4;
+//    static private int MAX_TEAM_SIZE = 4;
     private static int idCounter;
 
     private User captain;
@@ -24,6 +24,8 @@ public class Team {
     private String teamName;
     private int teamID;
     private String inviteCode;
+
+    private boolean complete;
 
     
 
@@ -51,14 +53,13 @@ public class Team {
     public String getInviteCode() {return inviteCode; }
 
     // returns true if member is added successfully, false otherwise
-    public boolean addMember(User newMember){
-        if(members.size() < MAX_TEAM_SIZE){
-            members.add(newMember);
+    public boolean addMember(User user, int maxSize) {
+        if (members.size() < maxSize) {
+            members.add(user);
             return true;
         }
-        else{
-            return false;
-        }
+
+        return false;
     }
 
     public boolean removeMember(String usernameToRemove){
@@ -69,6 +70,13 @@ public class Team {
             }
         }
         return false;
+    }
+    public boolean isComplete() {
+        return complete;
+    }
+
+    public void setComplete(boolean complete) {
+        this.complete = complete;
     }
 
 }

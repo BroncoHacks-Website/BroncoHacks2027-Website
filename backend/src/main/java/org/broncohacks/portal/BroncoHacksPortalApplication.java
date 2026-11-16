@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 // TODO:
 // Implement DTOs for standardized JSON response for team requests 
 //
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class BroncoHacksPortalApplication {
     //Some placeholder database structure. Replace with PostgreSQL when necessary.
     public static ArrayList<User> databaseUsers = new ArrayList<User>();

@@ -15,3 +15,6 @@ server:
 jwt:
   # local dev only
   secret: ${JWT_SECRET:c3VjY2Vzc2Z1bGRpZmZlcmVuY2V0aG91Z2hicnVzaHJpc2VzYW5kbmlnaHRzYWxlbG8=}
+team:
+  min-size: 2
+  max-size: 4
