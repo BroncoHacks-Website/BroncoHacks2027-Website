@@ -36,25 +36,29 @@ export type AuthResult =
       error: AuthErrorResponse;
     };
 
+let authToken: string | null = null; 
+
 export async function signIn(
   request: SignInRequest
-): Promise<AuthResult> {
-  // Future backend integration:
-  // POST /api/auth/sign-in
+): Promise<{ token: string }> {
+  const data = await apiFetch<{ token: string }>("/auth/signin", {
+    method: "POST",
+    body: JSON.stringify({
+      email: request.email,
+      password: request.password,
+    }),
+  });
 
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  if (!data || typeof data.token !== "string" || !data.token) { //
+    throw new Error("Sign-in response did not include a token.");
+  }
 
-  return {
-    ok: true,
-    data: {
-      user: {
-        id: "999",
-        name: "Ahmad",
-        email: request.email,
-      },
-      token: "fake-sign-in-token",
-    },
-  };
+  if (typeof window !== "undefined") {
+    window.sessionStorage.setItem("authToken", data.token); //store authentication token in session storage
+  }
+
+  authToken = data.token; //store authentication token in memory
+  return data;
 }
 
 export async function signUp(
