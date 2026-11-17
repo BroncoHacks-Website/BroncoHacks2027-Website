@@ -36,9 +36,7 @@ export type AuthResult =
       error: AuthErrorResponse;
     };
 
-export async function signIn(
-  request: SignInRequest
-): Promise<AuthResult> {
+export async function signIn(request: SignInRequest): Promise<AuthResult> {
   // Future backend integration:
   // POST /api/auth/sign-in
 
@@ -57,13 +55,11 @@ export async function signIn(
   };
 }
 
-export async function signUp(
-  request: SignUpRequest
-): Promise<void> {
+export async function signUp(request: SignUpRequest): Promise<void> {
   await apiFetch<null>("/auth/signup", {
     method: "POST",
     body: JSON.stringify({
-      username: request.name,
+      name: request.name,
       email: request.email,
       password: request.password,
     }),

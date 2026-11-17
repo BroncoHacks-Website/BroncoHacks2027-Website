@@ -1,32 +1,31 @@
 package org.broncohacks.portal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.stereotype.Component;
+import java.util.Locale;
 
 public class User {
-    public User(String t_username, String t_pwHash, String t_email){
+  private String name;
+  private String pwHash;
+  private String email;
 
-        username = t_username;
-        pwHash = t_pwHash;
-        email = t_email;
-    }
-    private String username;
-    private String pwHash;
-    private String email;
-    private Team team;
-    public String getUsername() {
-        return username;
-    }
+  public User(String name, String pwHash, String email) {
+    this.name = name;
+    this.pwHash = pwHash;
+    this.email = email.trim().toLowerCase(Locale.ROOT);
+  }
 
-    //makes sure that the user's password hash does NOT get revealed in the JSON sent to frontend :skull:
-    @JsonIgnore
-    public String getPwHash() {
-        return pwHash;
-    }
+  public String getName() {
+    return this.name;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  // makes sure that the user's password hash does NOT get revealed in the JSON sent to frontend
+  // :skull:
+  @JsonIgnore
+  public String getPwHash() {
+    return this.pwHash;
+  }
 
+  public String getEmail() {
+    return this.email;
+  }
 }

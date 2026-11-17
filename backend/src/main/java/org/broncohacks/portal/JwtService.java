@@ -19,10 +19,10 @@ public class JwtService {
     this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
   }
 
-  public String createToken(String username) {
+  public String createToken(String email) {
     Instant now = Instant.now();
     return Jwts.builder()
-        .subject(username)
+        .subject(email)
         .issuedAt(Date.from(now))
         .expiration(Date.from(now.plus(TOKEN_LIFETIME)))
         .signWith(key)
