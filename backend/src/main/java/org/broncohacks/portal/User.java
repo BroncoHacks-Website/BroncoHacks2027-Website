@@ -2,8 +2,12 @@ package org.broncohacks.portal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Locale;
+import java.util.UUID;
 
 public class User {
+  // @TODO: store id in future database
+  private final UUID id = UUID.randomUUID();
+
   private String name;
   private String pwHash;
   private String email;
@@ -12,6 +16,10 @@ public class User {
     this.name = name;
     this.pwHash = pwHash;
     this.email = email.trim().toLowerCase(Locale.ROOT);
+  }
+
+  public UUID getId() {
+    return this.id;
   }
 
   public String getName() {

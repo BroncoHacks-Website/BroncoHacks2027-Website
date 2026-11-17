@@ -28,4 +28,15 @@ public class JwtService {
         .signWith(key)
         .compact();
   }
+
+  public String validateAndGetEmail(String token) throws IllegalArgumentException {
+    String email =
+        Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload().getSubject();
+
+    if (email == null || email.isBlank()) {
+      throw new IllegalArgumentException("Token does not contain an email");
+    }
+
+    return email;
+  }
 }
