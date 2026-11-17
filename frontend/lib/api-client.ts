@@ -22,9 +22,17 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const requestUrl = new URL(path, API_BASE_URL).toString();
   const headers = new Headers(options.headers ?? {});
+  const token =
+    typeof window !== "undefined"
+      ? window.sessionStorage.getItem("authToken")
+      : null;
 
   if (options.body !== undefined && options.body !== null && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
+  }
+
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
   if (!headers.has("Accept")) {

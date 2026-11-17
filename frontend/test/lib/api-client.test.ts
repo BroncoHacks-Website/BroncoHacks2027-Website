@@ -1,9 +1,13 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { API_BASE_URL, ApiError, apiFetch } from "../../lib/api-client";
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+beforeEach(() => {
+  window.sessionStorage.clear();
 });
 
 describe("apiFetch", () => {
@@ -62,5 +66,21 @@ describe("apiFetch", () => {
       name: "ApiError",
       message: "Failed to fetch",
     });
+  });
+
+  it("sends the saved token with the request", async () => {
+    window.sessionStorage.setItem("authToken", "test-token");
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: vi.fn().mockResolvedValue(JSON.stringify({ successful: true, data: [] })),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await apiFetch("/users");
+
+    expect(fetchMock.mock.calls[0][1]?.headers?.get("Authorization")).toBe(
+      "Bearer test-token",
+    );
   });
 });
