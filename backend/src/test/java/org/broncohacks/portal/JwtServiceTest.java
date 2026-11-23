@@ -14,12 +14,12 @@ class JwtServiceTest {
   private static final String SECRET = "MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=";
 
   @Test
-  void tokenContainsUsernameAndExpiresAfterOneDay() {
-    String token = new JwtService(SECRET).createToken("bob");
+  void tokenContainsEmailAndExpiresAfterOneDay() {
+    String token = new JwtService(SECRET).createToken("bob@test.com");
     SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET));
     Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
 
-    assertEquals("bob", claims.getSubject());
+    assertEquals("bob@test.com", claims.getSubject());
     assertEquals(
         Duration.ofHours(24).toMillis(),
         claims.getExpiration().getTime() - claims.getIssuedAt().getTime());

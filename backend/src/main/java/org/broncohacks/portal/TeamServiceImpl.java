@@ -1,12 +1,10 @@
 package org.broncohacks.portal;
-
-import org.broncohacks.portal.auth.UserRepository;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.Optional;
+import org.broncohacks.portal.auth.UserRepository;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TeamServiceImpl implements TeamService{
@@ -32,19 +30,19 @@ public class TeamServiceImpl implements TeamService{
         return response;
     }
 
-    public TeamResponse createTeam(CreateTeamRequest request) {
-        String newTeamName = request.getTeamName();
-        if (newTeamName.isBlank()) {
-            TeamResponse error = new TeamResponse(false, "Team name cannot be blank", null);
-            return error;
-        }
+  public TeamResponse createTeam(CreateTeamRequest request) {
+    String newTeamName = request.getTeamName();
+    if (newTeamName.isBlank()) {
+      TeamResponse error = new TeamResponse(false, "Team name cannot be blank", null);
+      return error;
+    }
 
-        for (Team team : teamRepository.findAll()) {
-            if (team.getTeamName().equals(newTeamName)) {
-                TeamResponse error = new TeamResponse(false, "Team name already in use", null);
-                return error;
-            }
-        }
+    for (Team team : teamRepository.findAll()) {
+      if (team.getTeamName().equals(newTeamName)) {
+        TeamResponse error = new TeamResponse(false, "Team name already in use", null);
+        return error;
+      }
+    }
 
         Team newTeam = new Team(newTeamName);
         newTeam.setComplete(newTeam.size() >= teamProperties.minSize());
@@ -54,37 +52,35 @@ public class TeamServiceImpl implements TeamService{
         return response;
     }
 
-    public TeamResponse joinTeam( JoinTeamRequest request) {
-        Team teamToJoin = null;
-        Optional<User> userToJoin = null;
+  public TeamResponse joinTeam(JoinTeamRequest request) {
+    Team teamToJoin = null;
+    Optional<User> userToJoin = null;
 
-        //Search teams
-        for (Team team : teamRepository.findAll()) {
-            if (team.getInviteCode().equals(request.getInviteCode())) {
-                teamToJoin = team;
-                break;
-            }
-        }
+    // Search teams
+    for (Team team : teamRepository.findAll()) {
+      if (team.getInviteCode().equals(request.getInviteCode())) {
+        teamToJoin = team;
+        break;
+      }
+    }
 
-        //Search users
-        userToJoin = userRepository.findByUsername(request.getNewMemberName());
+    // Search users
+    userToJoin = userRepository.findByEmail(request.getNewMemberEmail());
 
-        //Invalid invite code
-        if (teamToJoin == null) {
-            TeamResponse error = new TeamResponse(false, "Invalid invite code", null);
-            return error;
-        }
-        //User doesn't exist
-        if (userToJoin.isEmpty()) {
-            TeamResponse error = new TeamResponse(false, "User specified does not exist.", null);
-            return error;
-        }
+    // Invalid invite code
+    if (teamToJoin == null) {
+      TeamResponse error = new TeamResponse(false, "Invalid invite code", null);
+      return error;
+    }
+    // User doesn't exist
+    if (userToJoin.isEmpty()) {
+      TeamResponse error = new TeamResponse(false, "User specified does not exist.", null);
+      return error;
+    }
 
         //Successful!
         if (teamToJoin.addMember(userToJoin.get(), teamProperties.maxSize())) {
-
             teamToJoin.setComplete(teamToJoin.size() >= teamProperties.minSize());
-
             TeamResponse response = new TeamResponse(true, "User added to team successfully",
                     List.of(teamToJoin));
             return response;
@@ -96,33 +92,32 @@ public class TeamServiceImpl implements TeamService{
         }
     }
 
-    public TeamResponse leaveTeam(LeaveTeamRequest request) {
-        Team teamToLeave = null;
-        Optional<User> userToLeave = null;
+  public TeamResponse leaveTeam(LeaveTeamRequest request) {
+    Team teamToLeave = null;
+    Optional<User> userToLeave = null;
 
-        for (Team team : teamRepository.findAll()) {
-            if (team.getTeamName().equals(request.getTeamName())) {
-                teamToLeave = team;
-                break;
-            }
-        }
-
-        userToLeave = userRepository.findByUsername(request.getUserName());
-
-        if (teamToLeave == null) {
-            TeamResponse error = new TeamResponse(false, "Team not found", null);
-            return error;
-        }
-        if (userToLeave.isEmpty()) {
-            TeamResponse error = new TeamResponse(false, "User not found", null);
-            return error;
-        }
-
-        teamToLeave.removeMember(userToLeave.get().getUsername());
-        teamToLeave.setComplete(teamToLeave.size() >= teamProperties.minSize());
-        List<Team> responseData = List.of(teamToLeave);
-        TeamResponse response = new TeamResponse(true, "Left team successfully", responseData);
-        return response;
+    for (Team team : teamRepository.findAll()) {
+      if (team.getTeamName().equals(request.getTeamName())) {
+        teamToLeave = team;
+        break;
+      }
     }
-}
 
+    userToLeave = userRepository.findByEmail(request.getEmail());
+
+    if (teamToLeave == null) {
+      TeamResponse error = new TeamResponse(false, "Team not found", null);
+      return error;
+    }
+    if (userToLeave.isEmpty()) {
+      TeamResponse error = new TeamResponse(false, "User not found", null);
+      return error;
+    }
+
+    teamToLeave.removeMember(userToLeave.get().getEmail());
+    teamToLeave.setComplete(teamToLeave.size() >= teamProperties.minSize());
+    List<Team> responseData = List.of(teamToLeave);
+    TeamResponse response = new TeamResponse(true, "Left team successfully", responseData);
+    return response;
+  }
+}
