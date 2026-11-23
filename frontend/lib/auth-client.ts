@@ -36,7 +36,7 @@ export type AuthResult =
       error: AuthErrorResponse;
     };
 
-let authToken: string | null = null; 
+let authToken: string | null = null;
 
 export async function signIn(
   request: SignInRequest
@@ -49,7 +49,7 @@ export async function signIn(
     }),
   });
 
-  if (!data || typeof data.token !== "string" || !data.token) { //
+  if (!data || typeof data.token !== "string" || !data.token) {
     throw new Error("Sign-in response did not include a token.");
   }
 
@@ -61,13 +61,11 @@ export async function signIn(
   return data;
 }
 
-export async function signUp(
-  request: SignUpRequest
-): Promise<void> {
+export async function signUp(request: SignUpRequest): Promise<void> {
   await apiFetch<null>("/auth/signup", {
     method: "POST",
     body: JSON.stringify({
-      username: request.name,
+      name: request.name,
       email: request.email,
       password: request.password,
     }),
