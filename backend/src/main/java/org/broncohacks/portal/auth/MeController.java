@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MeController {
   @GetMapping("/auth/me")
-  public PublicUser me(@AuthenticationPrincipal User user) {
-    return new PublicUser(user.getId(), user.getName(), user.getEmail());
+  public AuthResponse me(@AuthenticationPrincipal User user) {
+    PublicUser profile = new PublicUser(user.getId(), user.getName(), user.getEmail());
+
+    return new AuthResponse(true, "Current user retrieved successfully", profile);
   }
 }

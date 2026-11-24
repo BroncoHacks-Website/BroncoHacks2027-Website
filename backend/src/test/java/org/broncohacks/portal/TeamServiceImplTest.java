@@ -5,34 +5,35 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
-import org.broncohacks.portal.auth.UserRepository;
 import org.junit.jupiter.api.Test;
 
 class TeamServiceImplTest {
   @Test
-  void joinAndLeaveIdentifyMembersByEmailNotSharedName() {
+  void joinAndLeaveUseTheSuppliedAuthenticatedUser() {
     TeamRepository teams = mock(TeamRepository.class);
-    UserRepository users = mock(UserRepository.class);
-    TeamServiceImpl service = new TeamServiceImpl(teams, users);
+    TeamServiceImpl service = new TeamServiceImpl(teams);
     Team team = new Team("Test team");
+
     User first = new User("Bob", "hash", "first@test.com");
     User second = new User("Bob", "hash", "second@test.com");
     team.addMember(first);
-    when(teams.findAll()).thenReturn(List.of(team));
-    when(users.findByEmail("second@test.com")).thenReturn(Optional.of(second));
 
-    JoinTeamRequest joinReq = new JoinTeamRequest();
-    joinReq.setInviteCode(team.getInviteCode());
-    joinReq.setNewMemberEmail("second@test.com");
-    assertTrue(service.joinTeam(joinReq).isSuccessful());
+    when(teams.findByInviteCode(team.getInviteCode())).thenReturn(Optional.of(team));
+    when(teams.findByName(team.getTeamName())).thenReturn(Optional.of(team));
+
+    JoinTeamRequest join = new JoinTeamRequest();
+    join.setInviteCode(team.getInviteCode());
+
+    assertTrue(service.joinTeam(join, second).isSuccessful());
     assertEquals(List.of(first, second), team.getMembers());
 
-    LeaveTeamRequest leaveReq = new LeaveTeamRequest();
-    leaveReq.setTeamName(team.getTeamName());
-    leaveReq.setEmail("second@test.com");
-    assertTrue(service.leaveTeam(leaveReq).isSuccessful());
+    LeaveTeamRequest leave = new LeaveTeamRequest();
+    leave.setTeamName(team.getTeamName());
+
+    assertTrue(service.leaveTeam(leave, second).isSuccessful());
     assertEquals(List.of(first), team.getMembers());
-    assertFalse(team.removeMember("missing@test.com"));
-    verify(users, times(2)).findByEmail("second@test.com");
+
+    assertFalse(service.leaveTeam(leave, second).isSuccessful());
+    assertEquals(List.of(first), team.getMembers());
   }
 }
