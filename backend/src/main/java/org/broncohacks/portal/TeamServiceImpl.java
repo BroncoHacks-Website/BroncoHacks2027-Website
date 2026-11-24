@@ -2,17 +2,14 @@ package org.broncohacks.portal;
 
 import java.util.List;
 import java.util.Optional;
-import org.broncohacks.portal.auth.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TeamServiceImpl implements TeamService {
   private final TeamRepository teamRepository;
-  private final UserRepository userRepository;
 
-  public TeamServiceImpl(TeamRepository teamRepository, UserRepository userRepository) {
+  public TeamServiceImpl(TeamRepository teamRepository) {
     this.teamRepository = teamRepository;
-    this.userRepository = userRepository;
   }
 
   public TeamResponse listTeams() {
@@ -21,8 +18,8 @@ public class TeamServiceImpl implements TeamService {
     return response;
   }
 
-  public TeamResponse createTeam(CreateTeamRequest request) {
-    String newTeamName = request.getTeamName();
+  public TeamResponse createTeam(CreateTeamRequest req) {
+    String newTeamName = req.getTeamName();
     if (newTeamName.isBlank()) {
       TeamResponse error = new TeamResponse(false, "Team name cannot be blank", null);
       return error;
@@ -38,74 +35,35 @@ public class TeamServiceImpl implements TeamService {
     Team newTeam = new Team(newTeamName);
     teamRepository.save(newTeam);
     List<Team> responseData = List.of(newTeam);
-    TeamResponse response = new TeamResponse(true, "New team created successfully", responseData);
-    return response;
+    TeamResponse res = new TeamResponse(true, "New team created successfully", responseData);
+    return res;
   }
 
-  public TeamResponse joinTeam(JoinTeamRequest request) {
-    Team teamToJoin = null;
-    Optional<User> userToJoin = null;
-
-    // Search teams
-    for (Team team : teamRepository.findAll()) {
-      if (team.getInviteCode().equals(request.getInviteCode())) {
-        teamToJoin = team;
-        break;
-      }
+  public TeamResponse joinTeam(JoinTeamRequest req, User user) {
+    Optional<Team> res = teamRepository.findByInviteCode(req.getInviteCode());
+    if (res.isEmpty()) {
+      return new TeamResponse(false, "Invalid invite code", null);
     }
 
-    // Search users
-    userToJoin = userRepository.findByEmail(request.getNewMemberEmail());
-
-    // Invalid invite code
-    if (teamToJoin == null) {
-      TeamResponse error = new TeamResponse(false, "Invalid invite code", null);
-      return error;
-    }
-    // User doesn't exist
-    if (userToJoin.isEmpty()) {
-      TeamResponse error = new TeamResponse(false, "User specified does not exist.", null);
-      return error;
+    Team team = res.get();
+    if (!team.addMember(user)) {
+      return new TeamResponse(false, "The requested team is full.", null);
     }
 
-    // Successful!
-    if (teamToJoin.addMember(userToJoin.get())) {
-      TeamResponse response =
-          new TeamResponse(true, "User added to team successfully", List.of(teamToJoin));
-      return response;
-    }
-    // Team is full
-    else {
-      TeamResponse error = new TeamResponse(false, "The requested team is full.", null);
-      return error;
-    }
+    return new TeamResponse(true, "User added to team successfully", List.of(team));
   }
 
-  public TeamResponse leaveTeam(LeaveTeamRequest request) {
-    Team teamToLeave = null;
-    Optional<User> userToLeave = null;
-
-    for (Team team : teamRepository.findAll()) {
-      if (team.getTeamName().equals(request.getTeamName())) {
-        teamToLeave = team;
-        break;
-      }
+  public TeamResponse leaveTeam(LeaveTeamRequest req, User user) {
+    Optional<Team> res = teamRepository.findByName(req.getTeamName());
+    if (res.isEmpty()) {
+      return new TeamResponse(false, "Team not found", null);
     }
 
-    userToLeave = userRepository.findByEmail(request.getEmail());
-
-    if (teamToLeave == null) {
-      TeamResponse error = new TeamResponse(false, "Team not found", null);
-      return error;
-    }
-    if (userToLeave.isEmpty()) {
-      TeamResponse error = new TeamResponse(false, "User not found", null);
-      return error;
+    Team team = res.get();
+    if (!team.removeMember(user.getEmail())) {
+      return new TeamResponse(false, "You are not a member of this team", null);
     }
 
-    teamToLeave.removeMember(userToLeave.get().getEmail());
-    List<Team> responseData = List.of(teamToLeave);
-    TeamResponse response = new TeamResponse(true, "Left team successfully", responseData);
-    return response;
+    return new TeamResponse(true, "Left team successfully", List.of(team));
   }
 }

@@ -2,6 +2,7 @@ package org.broncohacks.portal;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,23 +37,18 @@ public class TeamController {
 
   // Join request body consists of inviteCode and newMemberEmail (both strings)
   @PostMapping("/join")
-  public ResponseEntity<TeamResponse> joinTeam(@Valid @RequestBody JoinTeamRequest request) {
+  public ResponseEntity<TeamResponse> joinTeam(
+      @Valid @RequestBody JoinTeamRequest req, @AuthenticationPrincipal User user) {
 
-    TeamResponse response = teamService.joinTeam(request);
-    if (response.isSuccessful()) {
-      return ResponseEntity.ok(response);
-    } else {
-      return ResponseEntity.badRequest().body(response);
-    }
+    TeamResponse res = teamService.joinTeam(req, user);
+    return res.isSuccessful() ? ResponseEntity.ok(res) : ResponseEntity.badRequest().body(res);
   }
 
   @PostMapping("/leave")
-  public ResponseEntity<TeamResponse> leaveTeam(@Valid @RequestBody LeaveTeamRequest request) {
-    TeamResponse response = teamService.leaveTeam(request);
-    if (response.isSuccessful()) {
-      return ResponseEntity.ok(response);
-    } else {
-      return ResponseEntity.badRequest().body(response);
-    }
+  public ResponseEntity<TeamResponse> leaveTeam(
+      @Valid @RequestBody LeaveTeamRequest req, @AuthenticationPrincipal User user) {
+
+    TeamResponse res = teamService.leaveTeam(req, user);
+    return res.isSuccessful() ? ResponseEntity.ok(res) : ResponseEntity.badRequest().body(res);
   }
 }

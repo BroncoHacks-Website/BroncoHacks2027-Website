@@ -1,5 +1,6 @@
 package org.broncohacks.portal.auth;
 
+import static org.broncohacks.portal.TestConstants.JWT_SECRET;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -31,10 +32,7 @@ class EmailAuthIntegrationTest {
     this.originalUsers = new ArrayList<>(BroncoHacksPortalApplication.databaseUsers);
     BroncoHacksPortalApplication.databaseUsers.clear();
     AuthService service =
-        new AuthServiceImpl(
-            repository,
-            new BCryptPasswordEncoder(),
-            new JwtService("MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE="));
+        new AuthServiceImpl(repository, new BCryptPasswordEncoder(), new JwtService(JWT_SECRET));
     mvc =
         MockMvcBuilders.standaloneSetup(
                 new SignUpController(service), new SignInController(service))
