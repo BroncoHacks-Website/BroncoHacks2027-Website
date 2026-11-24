@@ -1,6 +1,15 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it, beforeEach, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import SignInPage from "../../../app/(auth)/sign-in/page";
+import { apiFetch } from "../../../lib/api-client";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}));
+
+vi.mock("../../../lib/api-client", () => ({
+  apiFetch: vi.fn().mockResolvedValue({ token: "test-token" }),
+}));
 
 describe("SignInPage submit states", () => {
   beforeEach(() => {
@@ -62,5 +71,26 @@ describe("SignInPage submit states", () => {
     expect(
       screen.queryByText("Please fix the highlighted errors.")
     ).not.toBeInTheDocument();
+  });
+
+  it("shows the backend's message when sign-in fails", async () => {
+    vi.mocked(apiFetch).mockRejectedValueOnce(
+      new Error("Email or password incorrect")
+    );
+    render(<SignInPage />);
+
+    fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
+      target: { value: "ahmad@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("••••••••"), {
+      target: { value: "WrongPass1!" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Email or password incorrect")
+      ).toBeInTheDocument();
+    });
   });
 });

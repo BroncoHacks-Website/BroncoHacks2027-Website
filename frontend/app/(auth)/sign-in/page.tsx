@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { signIn } from "../../../lib/auth-client";
 import { useState } from "react";
 import AuthCard from "../auth/AuthCard";
@@ -12,6 +13,7 @@ import {
 } from "../auth/validation";
 
 export default function SignInPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -21,6 +23,7 @@ export default function SignInPage() {
   });
 
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const [submitError, setSubmitError] = useState("");
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -31,6 +34,7 @@ export default function SignInPage() {
     });
 
     setErrors(newErrors);
+    setSubmitError("");
 
     if (hasValidationErrors(newErrors)) {
       setSubmitState("error");
@@ -39,11 +43,11 @@ export default function SignInPage() {
 
     try {
       setSubmitState("submitting");
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
+      await signIn({ email, password });
       setSubmitState("success");
-    } catch {
+      router.push("/teams"); // redirect to /teams on success
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Unable to sign in.");
       setSubmitState("error");
     }
   };
@@ -91,7 +95,9 @@ export default function SignInPage() {
         )}
 
         {submitState === "error" && (
-          <p className="status-full">Please fix the highlighted errors.</p>
+          <p className="status-full">
+            {submitError || "Please fix the highlighted errors."}
+          </p>
         )}
       </form>
     </AuthCard>
