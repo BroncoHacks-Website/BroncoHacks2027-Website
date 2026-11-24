@@ -13,11 +13,11 @@ class TeamServiceImplTest {
   void joinAndLeaveIdentifyMembersByEmailNotSharedName() {
     TeamRepository teams = mock(TeamRepository.class);
     UserRepository users = mock(UserRepository.class);
-    TeamServiceImpl service = new TeamServiceImpl(teams, users);
+    TeamServiceImpl service = new TeamServiceImpl(teams, users, new TeamProperties(2, 4));
     Team team = new Team("Test team");
     User first = new User("Bob", "hash", "first@test.com");
     User second = new User("Bob", "hash", "second@test.com");
-    team.addMember(first);
+    team.addMember(first, 4);
     when(teams.findAll()).thenReturn(List.of(team));
     when(users.findByEmail("second@test.com")).thenReturn(Optional.of(second));
 

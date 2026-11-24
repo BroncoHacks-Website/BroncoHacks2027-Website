@@ -6,20 +6,28 @@ import org.broncohacks.portal.auth.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TeamServiceImpl implements TeamService {
-  private final TeamRepository teamRepository;
-  private final UserRepository userRepository;
+public class TeamServiceImpl implements TeamService{
+    private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
+    private final TeamProperties teamProperties;
 
-  public TeamServiceImpl(TeamRepository teamRepository, UserRepository userRepository) {
-    this.teamRepository = teamRepository;
-    this.userRepository = userRepository;
-  }
+    public TeamServiceImpl(TeamRepository teamRepository, UserRepository userRepository, TeamProperties teamProperties) {
+        this.teamRepository = teamRepository;
+        this.userRepository = userRepository;
+        this.teamProperties = teamProperties;
+    }
 
-  public TeamResponse listTeams() {
-    List<Team> teamList = teamRepository.findAll();
-    TeamResponse response = new TeamResponse(true, "Teams listed successfully", teamList);
-    return response;
-  }
+    public TeamResponse listTeams() {
+
+        boolean successful = true;
+        String message = "Teams listed successfully";
+        List<Team> teamList = teamRepository.findAll();
+        for (Team team : teamList) {
+            team.setComplete(team.size() >= teamProperties.minSize());
+        }
+        TeamResponse response = new TeamResponse(successful, message, teamList);
+        return response;
+    }
 
   public TeamResponse createTeam(CreateTeamRequest request) {
     String newTeamName = request.getTeamName();
@@ -35,12 +43,13 @@ public class TeamServiceImpl implements TeamService {
       }
     }
 
-    Team newTeam = new Team(newTeamName);
-    teamRepository.save(newTeam);
-    List<Team> responseData = List.of(newTeam);
-    TeamResponse response = new TeamResponse(true, "New team created successfully", responseData);
-    return response;
-  }
+        Team newTeam = new Team(newTeamName);
+        newTeam.setComplete(newTeam.size() >= teamProperties.minSize());
+        teamRepository.save(newTeam);
+        List<Team> responseData = List.of(newTeam);
+        TeamResponse response = new TeamResponse(true, "New team created successfully", responseData);
+        return response;
+    }
 
   public TeamResponse joinTeam(JoinTeamRequest request) {
     Team teamToJoin = null;
@@ -68,18 +77,19 @@ public class TeamServiceImpl implements TeamService {
       return error;
     }
 
-    // Successful!
-    if (teamToJoin.addMember(userToJoin.get())) {
-      TeamResponse response =
-          new TeamResponse(true, "User added to team successfully", List.of(teamToJoin));
-      return response;
+        //Successful!
+        if (teamToJoin.addMember(userToJoin.get(), teamProperties.maxSize())) {
+            teamToJoin.setComplete(teamToJoin.size() >= teamProperties.minSize());
+            TeamResponse response = new TeamResponse(true, "User added to team successfully",
+                    List.of(teamToJoin));
+            return response;
+        }
+        //Team is full
+        else {
+            TeamResponse error = new TeamResponse(false, "The requested team is full.", null);
+            return error;
+        }
     }
-    // Team is full
-    else {
-      TeamResponse error = new TeamResponse(false, "The requested team is full.", null);
-      return error;
-    }
-  }
 
   public TeamResponse leaveTeam(LeaveTeamRequest request) {
     Team teamToLeave = null;
@@ -104,6 +114,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     teamToLeave.removeMember(userToLeave.get().getEmail());
+    teamToLeave.setComplete(teamToLeave.size() >= teamProperties.minSize());
     List<Team> responseData = List.of(teamToLeave);
     TeamResponse response = new TeamResponse(true, "Left team successfully", responseData);
     return response;

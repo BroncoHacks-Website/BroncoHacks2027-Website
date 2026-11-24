@@ -5,23 +5,24 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class Team {
-  private static int MAX_TEAM_SIZE = 4;
-  private static int idCounter;
+    private static int idCounter;
+    private User captain;
+    private ArrayList<User> members = new ArrayList<User>();
+    private String teamName;
+    private int teamID;
+    private String inviteCode;
+    private boolean complete;
 
-  private User captain;
-  private ArrayList<User> members = new ArrayList<User>();
-  private String teamName;
-  private int teamID;
-  private String inviteCode;
+    public Team(String teamName) {
+        LocalDateTime codeCreatedAt = LocalDateTime.now();
 
-  public Team(String teamName) {
-    LocalDateTime codeCreatedAt = LocalDateTime.now();
+        this.teamName = teamName;
+        this.inviteCode = UUID.randomUUID().toString().substring(0, 10).toUpperCase();
+        this.teamID = idCounter;
+        Team.idCounter++;
+    }
 
-    this.teamName = teamName;
-    this.inviteCode = UUID.randomUUID().toString().substring(0, 10).toUpperCase();
-    this.teamID = idCounter;
-    Team.idCounter++;
-  }
+
 
   public User getCaptain() {
     return captain;
@@ -47,15 +48,14 @@ public class Team {
     return inviteCode;
   }
 
-  // returns true if member is added successfully, false otherwise
-  public boolean addMember(User newMember) {
-    if (members.size() < MAX_TEAM_SIZE) {
-      members.add(newMember);
-      return true;
-    } else {
-      return false;
+    // returns true if member is added successfully, false otherwise
+    public boolean addMember(User user, int maxSize) {
+        if (members.size() < maxSize) {
+            members.add(user);
+            return true;
+        }
+        return false;
     }
-  }
 
   public boolean removeMember(String emailToRemove) {
     for (User member : members) {
@@ -66,4 +66,11 @@ public class Team {
     }
     return false;
   }
+    public boolean isComplete() {
+        return complete;
+    }
+
+    public void setComplete(boolean complete) {
+        this.complete = complete;
+    }
 }
